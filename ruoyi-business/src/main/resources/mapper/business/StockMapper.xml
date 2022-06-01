@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.StockMapper">
+    <select id="selectRealtimeStockAmount" resultType="com.ruoyi.business.domain.vo.StockAmountVo">
+        -- c.type 0:采购,1:租赁,2:外借,3:寄存
+        -- i.stock_type 0: 入库, 1: 出库
+        -- c.rental_type 0:短租 1:长租
+        select
+            -- 自有总量
+            sum(case when c.type = 0  then IF(i.stock_type = 0,id.total,-id.total)
+                else 0 end) as selfAmount,
+            -- 外借总量
+            sum(case when c.type = 2 and i.stock_type = 0 then IF(i.stock_type = 0,id.total,-id.total)
+                else 0 end) as lendingAmount,
+            -- 短租总量
+            sum(case when c.type = 1 and c.rental_type = 0 then IF(i.stock_type = 0,id.total,-id.total)
+                else 0 end) as  shortRentalAmount,
+            -- 长租总量
+            sum(case when c.type = 1 and c.rental_type = 1 then IF(i.stock_type = 0,id.total,-id.total)
+                else 0 end) as  longRentalAmount
+        from inventory i
+        left join contract c on i.contract_id = c.id
+        left join inventory_detail id on i.id = id.inventory_id;
+    </select>
+
+    <select id="selectRealtimeStockDetail" resultType="com.ruoyi.business.domain.vo.InventoryDetailVo">
+        select
+        mc.`name` as name,
+        ms.specs_name as specsName,
+        sum(case when c.type = 0 then
+                    IF(i.stock_type = 0,id.material_quantity,-id.material_quantity)
+                when c.type = 2 and i.stock_type = 0 then
+                    IF(i.stock_type = 0,id.material_quantity,-id.material_quantity)
+                when c.type = 1 then
+                    -IF(i.stock_type = 0,id.material_quantity,-id.material_quantity)
+                else 0 end ) as materialQuantity,
+        mc.a_unit as units,
+        IF(em.single_weight,em.single_weight,ms.single_weight) as singleWeight,
+        sum(case when c.type = 0 then
+                    IF(i.stock_type = 0,id.packages,-id.packages)
+                when c.type = 2 and i.stock_type = 0 then
+                    IF(i.stock_type = 0,id.packages,-id.packages)
+                when c.type = 1 then
+                    -IF(i.stock_type = 0,id.packages,-id.packages)
+                else 0 end ) as packages,
+        sum(case when c.type = 0 then
+                    IF(i.stock_type = 0,id.total,-id.total)
+                when c.type = 2 and i.stock_type = 0 then
+                    IF(i.stock_type = 0,id.total,-id.total)
+                when c.type = 1 then
+                    -IF(i.stock_type = 0,id.total,-id.total)
+        else 0 end ) as total
+        from inventory_detail id
+        left join inventory i on i.id = id.inventory_id
+        left join contract c on i.contract_id = c.id
+        left join material_category mc on mc.id = id.material_category_id
+        left join material_specs ms on ms.id = id.material_spec_id
+        left join external_material em on em.contract_id = id.external_contract_id and em.material_category_id = id.material_category_id and id.material_spec_id = em.material_spec_id
+        GROUP BY id.material_category_id, id.material_spec_id, id.external_contract_id
+        order by id.material_category_id, id.material_spec_id, id.external_contract_id
+    </select>
+
+    <select id="selectLongRentalDetail" resultType="com.ruoyi.business.domain.vo.InventoryDetailVo">
+        select
+        mc.`name` as name,
+        ms.specs_name as specsName,
+        sum(case when c.type = 1 and c.rental_type = 1 then
+                    IF(i.stock_type = 0,id.material_quantity,-id.material_quantity)
+                else 0 end ) as materialQuantity,
+        mc.a_unit as units,
+        IF(em.single_weight,em.single_weight,ms.single_weight) as singleWeight,
+        sum(case when c.type = 1 and c.rental_type = 1 then
+                    IF(i.stock_type = 0,id.packages,-id.packages)
+                else 0 end ) as packages,
+        sum(case when c.type = 1 and c.rental_type = 1 then
+                    IF(i.stock_type = 0,id.total,-id.total)
+                else 0 end ) as total
+        from inventory_detail id
+        left join inventory i on i.id = id.inventory_id
+        left join contract c on i.contract_id = c.id
+        left join material_category mc on mc.id = id.material_category_id
+        left join material_specs ms on ms.id = id.material_spec_id
+        left join external_material em on em.contract_id = id.external_contract_id and em.material_category_id = id.material_category_id and id.material_spec_id = em.material_spec_id
+        GROUP BY id.material_category_id, id.material_spec_id, id.external_contract_id
+        order by id.material_category_id, id.material_spec_id, id.external_contract_id
+    </select>
+</mapper>

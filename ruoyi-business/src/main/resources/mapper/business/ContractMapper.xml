@@ -1,0 +1,520 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.ContractMapper">
+
+    <resultMap type="com.ruoyi.business.domain.Contract" id="ContractResult">
+            <result property="id" column="id"/>
+            <result property="type" column="type"/>
+            <result property="rentalType" column="rental_type"/>
+            <result property="contractName" column="contract_name"/>
+            <result property="signedDate" column="signed_date"/>
+            <result property="warehouseId" column="warehouse_id"/>
+            <result property="projectId" column="project_id"/>
+            <result property="projectName" column="project_name"/>
+            <result property="inTime" column="in_time"/>
+            <result property="outTime" column="out_time"/>
+            <result property="resources" column="resources"/>
+            <result property="contractCode" column="contract_code"/>
+            <result property="businessCode" column="business_code"/>
+            <result property="formCode" column="form_code"/>
+            <result property="purchaseDeptName" column="purchase_dept_name"/>
+            <result property="purchaseSupplierId" column="purchase_supplier_id"/>
+            <result property="rentalLesseeId" column="rental_lessee_id"/>
+            <result property="rentalDeptName" column="rental_dept_name"/>
+            <result property="lendingDeptName" column="lending_dept_name"/>
+            <result property="lendingSupplierId" column="lending_supplier_id"/>
+            <result property="bailmentDeptName" column="bailment_dept_name"/>
+            <result property="bailmentLesseeId" column="bailment_lessee_id"/>
+            <result property="deptId" column="dept_id"/>
+            <result property="customerId" column="customer_id"/>
+            <result property="startTime" column="start_time"/>
+            <result property="endTime" column="end_time"/>
+            <result property="address" column="address"/>
+            <result property="linkMan" column="link_man"/>
+            <result property="linkPhone" column="link_phone"/>
+            <result property="operator" column="operator"/>
+            <result property="templateId" column="template_id"/>
+            <result property="remark" column="remark"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <resultMap id="ContractVoList" type="com.ruoyi.business.domain.vo.ContractVo" extends="ContractResult">
+        <result property="warehouseName" column="warehouseName"/>
+        <result property="templateName" column="templateName"/>
+        <result property="purchaseSupplierName" column="purchaseSupplierName"/>
+        <result property="rentalLesseeName" column="rentalLesseeName"/>
+        <result property="lendingSupplierName" column="lendingSupplierName"/>
+        <result property="bailmentLesseeName" column="bailmentLesseeName"/>
+
+    </resultMap>
+
+    <resultMap id="ContractVoResult" type="com.ruoyi.business.domain.vo.ContractVo" extends="ContractVoList">
+        <collection property="externalMaterialList" notNullColumn="sub_id"
+                    javaType="java.util.List" resultMap="ExternalMaterialResult"/>
+        <collection property="contractBillingList" notNullColumn="sub2_id"
+                    javaType="java.util.List" resultMap="ContractBillingResult"/>
+    </resultMap>
+
+    <resultMap type="com.ruoyi.business.domain.ContractBilling" id="ContractBillingResult">
+        <result property="id" column="sub2_id"/>
+        <result property="contractId" column="sub2_contract_id"/>
+        <result property="billingName" column="sub2_billing_name"/>
+        <result property="expenseType" column="sub2_expense_type"/>
+        <result property="materialCategoryId" column="sub2_material_category_id"/>
+        <result property="materialSpecId" column="sub2_material_spec_id"/>
+        <result property="unit" column="sub2_unit"/>
+        <result property="unitPrice" column="sub2_unit_price"/>
+        <result property="rate" column="sub2_rate"/>
+        <result property="remark" column="sub2_remark"/>
+        <result property="createBy" column="sub2_create_by"/>
+        <result property="createTime" column="sub2_create_time"/>
+        <result property="updateBy" column="sub2_update_by"/>
+        <result property="updateTime" column="sub2_update_time"/>
+        <result property="isDeleted" column="sub2_is_deleted"/>
+    </resultMap>
+
+    <resultMap id="ExternalMaterialResult" type="com.ruoyi.business.domain.vo.ExternalMaterialVo">
+        <result property="id" column="sub_id"/>
+        <result property="materialCategoryId" column="sub_material_category_id"/>
+        <result property="materialCategoryName" column="sub_material_category_name"/>
+        <result property="materialSpecId" column="sub_material_spec_id"/>
+        <result property="materialSpecName" column="sub_material_spec_name"/>
+        <result property="mainUnit" column="sub_unit"/>
+        <result property="singleWeight" column="sub_single_weight"/>
+        <result property="supplierId" column="sub_supplier_id"/>
+        <result property="supplierName" column="sub_supplier_name"/>
+    </resultMap>
+
+    <sql id="selectContractVo">
+        select c.id, c.type,c.rental_type, c.contract_name, c.signed_date, c.warehouse_id, w.name as warehouseName, c.purchase_dept_name,c.purchase_supplier_id,s.supplier_name as purchaseSupplierName,c.rental_lessee_id,l.company_name as rentalLesseeName,c.rental_dept_name,c.lending_dept_name,c.lending_supplier_id,s1.supplier_name as lendingSupplierName,c.bailment_dept_name,c.bailment_lessee_id, l1.company_name as bailmentLesseeName,c.project_name, c.in_time, c.out_time, c.resources, c.contract_code, c.business_code, c.form_code, c.customer_id, c.start_time, c.end_time, c.address, c.link_man, c.link_phone, c.operator, c.template_id, b.template_name as templateName, c.remark, c.create_by, c.create_time, c.update_by, c.update_time, c.is_deleted
+        from contract c
+        left join warehouse w on c.warehouse_id = w.id
+        left join supplier s on s.id = c.purchase_supplier_id
+        left join lessee l on l.id = c.rental_lessee_id
+        left join supplier s1 on s1.id = c.lending_supplier_id
+        left join lessee l1 on l1.id = c.bailment_lessee_id
+        left join billing b on c.template_id = b.id
+    </sql>
+
+    <select id="selectContractList" parameterType="ContractParam" resultMap="ContractVoList">
+        <include refid="selectContractVo"/>
+        <where>
+                        <if test="type != null ">
+                            and type = #{type}
+                        </if>
+                        <if test="contractName != null  and contractName != ''">
+                            and contract_name like concat('%', #{contractName}, '%')
+                        </if>
+                        <if test="startTime != null ">
+                            and start_time &gt;= #{startTime}
+                        </if>
+                        <if test="endTime != null ">
+                            and end_time &lt;= #{endTime}
+                        </if>
+        </where>
+        order by c.create_time desc
+    </select>
+
+    <select id="selectExternalMaterial" parameterType="com.ruoyi.business.domain.param.ExternalMaterialParam" resultMap="ExternalMaterialResult">
+        select
+        em.id as
+        sub_id, em.contract_id as
+        sub_contract_id, em.material_category_id as
+        sub_material_category_id, em.material_spec_id as
+        sub_material_spec_id, em.single_weight as
+        sub_single_weight, em.supplier_id as
+        sub_supplier_id, '暂未对接' as
+        sub_supplier_name, mc.`m_unit` as
+        sub_unit, mc.`name` as
+        sub_material_category_name, ms.`specs_name` as
+        sub_material_spec_name
+        from external_material em
+        left join material_category mc on mc.id = em.material_category_id
+        left join material_specs ms on ms.id = em.material_spec_id
+        <where>
+            <if test="materialCategoryId != null ">
+                and em.material_category_id = #{materialCategoryId}
+            </if>
+            <if test="materialSpecId != null ">
+                and em.material_spec_id = #{materialSpecId}
+            </if>
+            <if test="contractId != null ">
+                and em.contract_id = #{contractId}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectContractById" parameterType="Long"
+            resultMap="ContractVoResult">
+        select c.id, c.type,c.rental_type, c.contract_name,c.signed_date, c.warehouse_id, w.name as warehouseName, c.purchase_dept_name,c.purchase_supplier_id,s.supplier_name as purchaseSupplierName,c.rental_lessee_id,l.company_name as rentalLesseeName,c.rental_dept_name,c.lending_dept_name,c.lending_supplier_id,s1.supplier_name as lendingSupplierName,c.bailment_dept_name,c.bailment_lessee_id, l1.company_name as bailmentLesseeName, c.project_name, c.in_time, c.out_time, c.resources, c.contract_code, c.business_code, c.form_code,c.start_time, c.end_time, c.address, c.link_man, c.link_phone, c.operator, c.template_id, b.template_name as templateName, c.remark, c.create_by, c.create_time, c.update_by, c.update_time, c.is_deleted,
+        em.id as
+        sub_id, em.contract_id as
+        sub_contract_id, em.material_category_id as
+        sub_material_category_id, em.material_spec_id as
+        sub_material_spec_id, em.single_weight as
+        sub_single_weight, em.supplier_id as
+        sub_supplier_id, '暂未对接' as
+        sub_supplier_name, mc.`name` as
+        sub_material_category_name, mc.`name` as
+        sub_material_spec_name,
+        cb.id as sub2_id,
+        cb.contract_id as sub2_contract_id,
+        cb.billing_name as sub2_billing_name,
+        cb.expense_type as sub2_expense_type,
+        cb.material_category_id as sub2_material_category_id,
+        cb.material_spec_id as sub2_material_spec_id,
+        cb.unit as sub2_unit,
+        cb.unit_price as sub2_unit_price,
+        cb.rate as sub2_rate,
+        cb.remark as sub2_remark,
+        cb.create_by as sub2_create_by,
+        cb.create_time as sub2_create_time,
+        cb.update_by as sub2_update_by,
+        cb.update_time as sub2_update_time,
+        cb.is_deleted as sub2_is_deleted
+        from contract c
+        left join contract_billing cb on c.id = cb.contract_id
+        left join warehouse w on c.warehouse_id = w.id
+        left join billing b on c.template_id = b.id
+        left join supplier s on s.id = c.purchase_supplier_id
+        left join lessee l on l.id = c.rental_lessee_id
+        left join supplier s1 on s1.id = c.lending_supplier_id
+        left join lessee l1 on l1.id = c.bailment_lessee_id
+        left join external_material em on em.contract_id = c.id
+        left join material_category mc on mc.id = em.material_category_id
+        left join material_specs ms on ms.id = em.material_spec_id
+        where c.id = #{id}
+    </select>
+    <select id="selectContractBillingList" resultType="com.ruoyi.business.domain.ContractBilling">
+        SELECT
+        cb.id AS id,
+        cb.contract_id AS contractId,
+        cb.billing_name AS billingName,
+        cb.expense_type AS expenseType,
+        cb.material_category_id as materialCategoryId,
+        cb.material_spec_id as materialSpecId,
+        cb.unit AS unit,
+        cb.unit_price AS unitPrice,
+        cb.rate AS rate,
+        cb.remark AS remark
+        FROM
+        contract_billing cb
+        where cb.contract_id = #{contractId}
+        <if test="expenseType != null and expenseType != ''">
+            and cb.expense_type = #{expenseType}
+        </if>
+    </select>
+
+    <insert id="insertContract" parameterType="Contract" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into contract
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="type != null">type,
+                    </if>
+                    <if test="rentalType != null">rental_type,
+                    </if>
+                    <if test="contractName != null and contractName != ''">contract_name,
+                    </if>
+                    <if test="signedDate != null">signed_date,
+                    </if>
+                    <if test="warehouseId != null">warehouse_id,
+                    </if>
+                    <if test="purchaseDeptName != null and purchaseDeptName != ''">purchase_dept_name,
+                    </if>
+                    <if test="purchaseSupplierId != null">purchase_supplier_id,
+                    </if>
+                    <if test="rentalLesseeId != null">rental_lessee_id,
+                    </if>
+                    <if test="rentalDeptName != null and rentalDeptName != ''">rental_dept_name,
+                    </if>
+                    <if test="lendingDeptName != null and lendingDeptName != ''">lending_dept_name,
+                    </if>
+                    <if test="lendingSupplierId != null">lending_supplier_id,
+                    </if>
+                    <if test="bailmentDeptName != null and bailmentDeptName != ''">bailment_dept_name,
+                    </if>
+                    <if test="bailmentLesseeId != null">bailment_lessee_id,
+                    </if>
+                    <if test="projectName != null">project_name,
+                    </if>
+                    <if test="inTime != null">in_time,
+                    </if>
+                    <if test="outTime != null">out_time,
+                    </if>
+                    <if test="resources != null">resources,
+                    </if>
+                    <if test="contractCode != null and contractCode != ''">contract_code,
+                    </if>
+                    <if test="businessCode != null and businessCode != ''">business_code,
+                    </if>
+                    <if test="formCode != null and formCode != ''">form_code,
+                    </if>
+                    <if test="startTime != null">start_time,
+                    </if>
+                    <if test="endTime != null">end_time,
+                    </if>
+                    <if test="address != null">address,
+                    </if>
+                    <if test="linkMan != null">link_man,
+                    </if>
+                    <if test="linkPhone != null">link_phone,
+                    </if>
+                    <if test="operator != null">operator,
+                    </if>
+                    <if test="templateId != null">template_id,
+                    </if>
+                    <if test="remark != null">remark,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="type != null">#{type},
+                    </if>
+                    <if test="rentalType != null">#{rentalType},
+                    </if>
+                    <if test="contractName != null and contractName != ''">#{contractName},
+                    </if>
+                    <if test="signedDate != null">#{signedDate},
+                    </if>
+                    <if test="warehouseId != null">#{warehouseId},
+                    </if>
+                    <if test="purchaseDeptName != null and purchaseDeptName != ''">#{purchaseDeptName},
+                    </if>
+                    <if test="purchaseSupplierId != null">#{purchaseSupplierId},
+                    </if>
+                    <if test="rentalLesseeId != null">#{rentalLesseeId},
+                    </if>
+                    <if test="rentalDeptName != null and rentalDeptName != ''">#{rentalDeptName},
+                    </if>
+                    <if test="lendingDeptName != null and lendingDeptName != ''">#{lendingDeptName},
+                    </if>
+                    <if test="lendingSupplierId != null">#{lendingSupplierId},
+                    </if>
+                    <if test="bailmentDeptName != null and bailmentDeptName != ''">#{bailmentDeptName},
+                    </if>
+                    <if test="bailmentLesseeId != null">#{bailmentLesseeId},
+                    </if>
+                    <if test="projectName != null">#{projectName},
+                    </if>
+                    <if test="inTime != null">#{inTime},
+                    </if>
+                    <if test="outTime != null">#{outTime},
+                    </if>
+                    <if test="resources != null">#{resources},
+                    </if>
+                    <if test="contractCode != null and contractCode != ''">#{contractCode},
+                    </if>
+                    <if test="businessCode != null and businessCode != ''">#{businessCode},
+                    </if>
+                    <if test="formCode != null and formCode != ''">#{formCode},
+                    </if>
+                    <if test="startTime != null">#{startTime},
+                    </if>
+                    <if test="endTime != null">#{endTime},
+                    </if>
+                    <if test="address != null">#{address},
+                    </if>
+                    <if test="linkMan != null">#{linkMan},
+                    </if>
+                    <if test="linkPhone != null">#{linkPhone},
+                    </if>
+                    <if test="operator != null">#{operator},
+                    </if>
+                    <if test="templateId != null">#{templateId},
+                    </if>
+                    <if test="remark != null">#{remark},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateContract" parameterType="Contract">
+        update contract
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="type != null">type =
+                        #{type},
+                    </if>
+                    <if test="rentalType != null">rental_type =
+                        #{rentalType},
+                    </if>
+                    <if test="contractName != null and contractName != ''">contract_name =
+                        #{contractName},
+                    </if>
+                    <if test="signedDate != null">signed_date =
+                        #{signedDate},
+                    </if>
+                    <if test="warehouseId != null">warehouse_id =
+                        #{warehouseId},
+                    </if>
+                    <if test="purchaseDeptName != null and purchaseDeptName != ''">purchase_dept_name = #{purchaseDeptName},
+                    </if>
+                    <if test="purchaseSupplierId != null">purchase_supplier_id = #{purchaseSupplierId},
+                    </if>
+                    <if test="rentalLesseeId != null">rental_lessee_id = #{rentalLesseeId},
+                    </if>
+                    <if test="rentalDeptName != null and rentalDeptName != ''">rental_dept_name = #{rentalDeptName},
+                    </if>
+                    <if test="lendingDeptName != null and lendingDeptName != ''">lending_dept_name = #{lendingDeptName},
+                    </if>
+                    <if test="lendingSupplierId != null">lending_supplier_id = #{lendingSupplierId},
+                    </if>
+                    <if test="bailmentDeptName != null and bailmentDeptName != ''">bailment_dept_name = #{bailmentDeptName},
+                    </if>
+                    <if test="bailmentLesseeId != null">bailment_lessee_id = #{bailmentLesseeId},
+                    </if>
+                    <if test="projectName != null">project_name =
+                        #{projectName},
+                    </if>
+                    <if test="inTime != null">in_time =
+                        #{inTime},
+                    </if>
+                    <if test="outTime != null">out_time =
+                        #{outTime},
+                    </if>
+                    <if test="resources != null">resources =
+                        #{resources},
+                    </if>
+                    <if test="contractCode != null">contract_code =
+                        #{contractCode},
+                    </if>
+                    <if test="businessCode != null and businessCode != ''">business_code =
+                        #{businessCode},
+                    </if>
+                    <if test="formCode != null and formCode != ''">form_code =
+                        #{formCode},
+                    </if>
+                    <if test="startTime != null">start_time =
+                        #{startTime},
+                    </if>
+                    <if test="endTime != null">end_time =
+                        #{endTime},
+                    </if>
+                    <if test="address != null">address =
+                        #{address},
+                    </if>
+                    <if test="linkMan != null">link_man =
+                        #{linkMan},
+                    </if>
+                    <if test="linkPhone != null">link_phone =
+                        #{linkPhone},
+                    </if>
+                    <if test="operator != null">operator =
+                        #{operator},
+                    </if>
+                    <if test="templateId != null">template_id =
+                        #{templateId},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteContractById" parameterType="Long">
+        delete from contract where id = #{id}
+    </delete>
+
+    <delete id="deleteContractByIds" parameterType="String">
+        delete from contract where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+    <delete id="deleteExternalMaterialByContractIds" parameterType="String">
+        delete from external_material where contract_id in
+        <foreach item="contractId" collection="array" open="(" separator="," close=")">
+            #{contractId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteExternalMaterialByContractId" parameterType="Long">
+        delete from external_material where contract_id = #{contractId}
+    </delete>
+
+    <insert id="batchExternalMaterial">
+        insert into external_material
+        ( id        , contract_id        , material_category_id        , material_spec_id        , single_weight        , supplier_id) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id
+            }, #{item.contractId
+            }, #{item.materialCategoryId
+            }, #{item.materialSpecId
+            }, #{item.singleWeight
+            }, #{item.supplierId
+            })
+        </foreach>
+    </insert>
+
+    <delete id="deleteContractBillingByContractIds" parameterType="String">
+        delete from contract_billing where contract_id in
+        <foreach item="contractId" collection="array" open="(" separator="," close=")">
+            #{contractId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteContractBillingByContractId" parameterType="Long">
+        delete from contract_billing where contract_id = #{contractId}
+    </delete>
+
+    <insert id="batchContractBilling">
+        insert into contract_billing
+        (contract_id        , billing_name        , expense_type,material_category_id, material_spec_id        , unit        , unit_price        , rate        , remark        , create_by        , create_time        , update_by        , update_time        , is_deleted) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            (#{item.contractId
+            }, #{item.billingName
+            }, #{item.expenseType
+            }, #{item.materialCategoryId
+            }, #{item.materialSpecId
+            }, #{item.unit
+            }, #{item.unitPrice
+            }, #{item.rate
+            }, #{item.remark
+            }, #{item.createBy
+            }, #{item.createTime
+            }, #{item.updateBy
+            }, #{item.updateTime
+            }, #{item.isDeleted
+            })
+        </foreach>
+    </insert>
+</mapper>

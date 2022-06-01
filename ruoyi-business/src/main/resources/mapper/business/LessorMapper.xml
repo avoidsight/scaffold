@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.LessorMapper">
+
+    <resultMap type="Lessor" id="LessorResult">
+            <result property="id" column="id"/>
+            <result property="companyName" column="company_name"/>
+            <result property="usc" column="usc"/>
+            <result property="address" column="address"/>
+            <result property="remark" column="remark"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <sql id="selectLessorVo">
+        select id, company_name, usc, address, remark, create_by, create_time, update_by, update_time, is_deleted
+        from lessor
+    </sql>
+
+    <select id="selectLessorList" parameterType="Lessor" resultMap="LessorResult">
+        <include refid="selectLessorVo"/>
+        <where>
+                        <if test="companyName != null  and companyName != ''">
+                            and company_name like concat('%', #{companyName}, '%')
+                        </if>
+                        <if test="usc != null  and usc != ''">
+                            and usc = #{usc}
+                        </if>
+                        <if test="address != null  and address != ''">
+                            and address = #{address}
+                        </if>
+                        <if test="isDeleted != null ">
+                            and is_deleted = #{isDeleted}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectLessorById" parameterType="Long"
+            resultMap="LessorResult">
+            <include refid="selectLessorVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertLessor" parameterType="Lessor">
+        insert into lessor
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="id != null">id,
+                    </if>
+                    <if test="companyName != null and companyName != ''">company_name,
+                    </if>
+                    <if test="usc != null and usc != ''">usc,
+                    </if>
+                    <if test="address != null and address != ''">address,
+                    </if>
+                    <if test="remark != null">remark,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="id != null">#{id},
+                    </if>
+                    <if test="companyName != null and companyName != ''">#{companyName},
+                    </if>
+                    <if test="usc != null and usc != ''">#{usc},
+                    </if>
+                    <if test="address != null and address != ''">#{address},
+                    </if>
+                    <if test="remark != null">#{remark},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateLessor" parameterType="Lessor">
+        update lessor
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="companyName != null and companyName != ''">company_name =
+                        #{companyName},
+                    </if>
+                    <if test="usc != null and usc != ''">usc =
+                        #{usc},
+                    </if>
+                    <if test="address != null and address != ''">address =
+                        #{address},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLessorById" parameterType="Long">
+        delete from lessor where id = #{id}
+    </delete>
+
+    <delete id="deleteLessorByIds" parameterType="String">
+        delete from lessor where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

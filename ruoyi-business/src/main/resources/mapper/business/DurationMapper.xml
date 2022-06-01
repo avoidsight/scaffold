@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.DurationMapper">
+
+    <resultMap type="Duration" id="DurationResult">
+            <result property="id" column="id"/>
+            <result property="startDate" column="start_date"/>
+            <result property="endDate" column="end_date"/>
+            <result property="remark" column="remark"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <sql id="selectDurationVo">
+        select id, start_date, end_date, remark, create_by, create_time, update_by, update_time, is_deleted
+        from duration
+    </sql>
+
+    <select id="selectDurationList" parameterType="Duration" resultMap="DurationResult">
+        <include refid="selectDurationVo"/>
+        <where>
+                        <if test="startDate != null ">
+                            and start_date = #{startDate}
+                        </if>
+                        <if test="endDate != null ">
+                            and end_date = #{endDate}
+                        </if>
+                        <if test="isDeleted != null ">
+                            and is_deleted = #{isDeleted}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectDurationById" parameterType="Long"
+            resultMap="DurationResult">
+            <include refid="selectDurationVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertDuration" parameterType="Duration" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into duration
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="startDate != null">start_date,
+                    </if>
+                    <if test="endDate != null">end_date,
+                    </if>
+                    <if test="remark != null">remark,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="startDate != null">#{startDate},
+                    </if>
+                    <if test="endDate != null">#{endDate},
+                    </if>
+                    <if test="remark != null">#{remark},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateDuration" parameterType="Duration">
+        update duration
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="startDate != null">start_date =
+                        #{startDate},
+                    </if>
+                    <if test="endDate != null">end_date =
+                        #{endDate},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDurationById" parameterType="Long">
+        delete from duration where id = #{id}
+    </delete>
+
+    <delete id="deleteDurationByIds" parameterType="String">
+        delete from duration where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

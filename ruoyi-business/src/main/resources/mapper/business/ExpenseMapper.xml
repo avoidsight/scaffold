@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.ExpenseMapper">
+
+    <resultMap type="Expense" id="ExpenseResult">
+            <result property="id" column="id"/>
+            <result property="expenseName" column="expense_name"/>
+            <result property="expenseType" column="expense_type"/>
+            <result property="remark" column="remark"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <sql id="selectExpenseVo">
+        select id, expense_name, expense_type, remark, create_by, create_time, update_by, update_time, is_deleted
+        from expense
+    </sql>
+
+    <select id="selectExpenseList" parameterType="Expense" resultMap="ExpenseResult">
+        <include refid="selectExpenseVo"/>
+        <where>
+                        <if test="expenseName != null  and expenseName != ''">
+                            and expense_name like concat('%', #{expenseName}, '%')
+                        </if>
+                        <if test="expenseType != null ">
+                            and expense_type = #{expenseType}
+                        </if>
+                        <if test="isDeleted != null ">
+                            and is_deleted = #{isDeleted}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectExpenseById" parameterType="Long"
+            resultMap="ExpenseResult">
+            <include refid="selectExpenseVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertExpense" parameterType="Expense" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into expense
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="expenseName != null and expenseName != ''">expense_name,
+                    </if>
+                    <if test="expenseType != null">expense_type,
+                    </if>
+                    <if test="remark != null">remark,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="expenseName != null and expenseName != ''">#{expenseName},
+                    </if>
+                    <if test="expenseType != null">#{expenseType},
+                    </if>
+                    <if test="remark != null">#{remark},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateExpense" parameterType="Expense">
+        update expense
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="expenseName != null and expenseName != ''">expense_name =
+                        #{expenseName},
+                    </if>
+                    <if test="expenseType != null">expense_type =
+                        #{expenseType},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteExpenseById" parameterType="Long">
+        delete from expense where id = #{id}
+    </delete>
+
+    <delete id="deleteExpenseByIds" parameterType="String">
+        delete from expense where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.SettleMapper">
+    <resultMap type="com.ruoyi.business.domain.Settle" id="SettleResult">
+        <result property="id" column="id"/>
+        <result property="contractId" column="contract_id"/>
+        <result property="reconciliationStartDate" column="reconciliation_start_date"/>
+        <result property="reconciliationEndDate" column="reconciliation_end_date"/>
+        <result property="theoreticalInTotal" column="theoretical_in_total"/>
+        <result property="theoreticalOutTotal" column="theoretical_out_total"/>
+        <result property="warehouseInTotal" column="warehouse_in_total"/>
+        <result property="warehouseOutTotal" column="warehouse_out_total"/>
+        <result property="sceneInTotal" column="scene_in_total"/>
+        <result property="sceneOutTotal" column="scene_out_total"/>
+        <result property="status" column="status"/>
+        <result property="remark" column="remark"/>
+        <result property="createBy" column="create_by"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateBy" column="update_by"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+    <resultMap id="SettleSettleInventoryResult" type="com.ruoyi.business.domain.vo.SettleVo" extends="SettleResult">
+        <collection property="inventoryVoList"
+                    javaType="java.util.List" resultMap="InventoryVo"/>
+    </resultMap>
+    <resultMap type="com.ruoyi.business.domain.vo.InventoryVo" id="InventoryVo">
+        <result property="inventoryId" column="inventoryId"/>
+        <result property="createTime" column="createTime"/>
+        <result property="businessTime" column="businessDate"/>
+        <result property="contractType" column="contractType"/>
+        <result property="stockType" column="stockType"/>
+        <result property="supplierName" column="supplierName"/>
+        <result property="partA" column="partA"/>
+        <result property="partB" column="partB"/>
+        <result property="contractCode" column="contractCode"/>
+        <result property="contractName" column="contractName"/>
+        <result property="flowNo" column="flowNo"/>
+        <result property="businessNo" column="businessNo"/>
+        <result property="total" column="total"/>
+        <result property="operator" column="operator"/>
+        <result property="status" column="statistics_status"/>
+        <result property="remark" column="sub_remark"/>
+    </resultMap>
+    <insert id="insertSettle" parameterType="com.ruoyi.business.domain.Settle" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into settle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="contractId != null">contract_id,
+            </if>
+            <if test="reconciliationStartDate != null">reconciliation_start_date,
+            </if>
+            <if test="reconciliationEndDate != null">reconciliation_end_date,
+            </if>
+            <if test="theoreticalInTotal != null">theoretical_in_total,
+            </if>
+            <if test="theoreticalOutTotal != null">theoretical_out_total,
+            </if>
+            <if test="warehouseInTotal != null">warehouse_in_total,
+            </if>
+            <if test="warehouseOutTotal != null">warehouse_out_total,
+            </if>
+            <if test="sceneInTotal != null">scene_in_total,
+            </if>
+            <if test="sceneOutTotal != null">scene_out_total,
+            </if>
+            <if test="status != null">status,
+            </if>
+            <if test="remark != null">remark,
+            </if>
+            <if test="createBy != null">create_by,
+            </if>
+            <if test="createTime != null">create_time,
+            </if>
+            <if test="updateBy != null">update_by,
+            </if>
+            <if test="updateTime != null">update_time,
+            </if>
+            <if test="isDeleted != null">is_deleted,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="contractId != null">#{contractId},
+            </if>
+            <if test="reconciliationStartDate != null">#{reconciliationStartDate},
+            </if>
+            <if test="reconciliationEndDate != null">#{reconciliationEndDate},
+            </if>
+            <if test="theoreticalInTotal != null">#{theoreticalInTotal},
+            </if>
+            <if test="theoreticalOutTotal != null">#{theoreticalOutTotal},
+            </if>
+            <if test="warehouseInTotal != null">#{warehouseInTotal},
+            </if>
+            <if test="warehouseOutTotal != null">#{warehouseOutTotal},
+            </if>
+            <if test="sceneInTotal != null">#{sceneInTotal},
+            </if>
+            <if test="sceneOutTotal != null">#{sceneOutTotal},
+            </if>
+            <if test="status != null">#{status},
+            </if>
+            <if test="remark != null">#{remark},
+            </if>
+            <if test="createBy != null">#{createBy},
+            </if>
+            <if test="createTime != null">#{createTime},
+            </if>
+            <if test="updateBy != null">#{updateBy},
+            </if>
+            <if test="updateTime != null">#{updateTime},
+            </if>
+            <if test="isDeleted != null">#{isDeleted},
+            </if>
+        </trim>
+    </insert>
+    <insert id="batchSettleInventory">
+        insert into settle_inventory
+        ( id        , settle_id        , inventory_id        , create_by        , create_time        , update_by        , update_time        , is_deleted) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id
+            }, #{item.settleId
+            }, #{item.inventoryId
+            }, #{item.createBy
+            }, #{item.createTime
+            }, #{item.updateBy
+            }, #{item.updateTime
+            }, #{item.isDeleted
+            })
+        </foreach>
+    </insert>
+    <select id="list" parameterType="com.ruoyi.business.domain.param.SettleParam" resultType="com.ruoyi.business.domain.vo.SettleListVo">
+        select
+        s.id as settleId,
+        c.id as contractId,
+        s.create_time as createTime,
+        c.contract_code as contractCode,
+        c.type as contractType,
+        c.contract_name as contractName,
+        s.reconciliation_start_date as reconciliationStartDate,
+        s.reconciliation_end_date as reconciliationEndDate,
+        s.theoretical_in_total as theoreticalInTotal,
+        s.theoretical_out_total as theoreticalOutTotal,
+        s.warehouse_in_total as warehouseInTotal,
+        s.warehouse_out_total as warehouseOutTotal,
+        s.scene_in_total as sceneInTotal,
+        s.scene_out_total as sceneOutTotal,
+        s.status as status,
+        s.remark as remark
+        from settle s
+        left join contract c on s.contract_id = c.id
+        <where>
+            <if test="contractId != null ">
+                and s.contract_id = #{contractId}
+            </if>
+            <if test="startDate != null ">
+                and (s.reconciliation_start_date &gt;= #{startDate} or s.reconciliation_end_date &gt;= #{startDate})
+            </if>
+            <if test="endDate != null ">
+                and (s.reconciliation_start_date &lt;= #{endDate} or s.reconciliation_end_date &lt;= #{endDate})
+            </if>
+            <if test="contractType != null ">
+                and c.type = #{contractType}
+            </if>
+            <if test="status != null ">
+                and s.status = #{status}
+            </if>
+        </where>
+        order by s.update_time, s.create_time
+    </select>
+    <select id="summary" parameterType="com.ruoyi.business.domain.param.SettleParam" resultType="com.ruoyi.business.domain.vo.SettleSummaryVo">
+        select
+        i.business_date as businessDate,
+        "盘扣式脚手架" as materialName,
+        sum(IF(i.stock_type =0,total,0)) as inTotal,
+        sum(IF(i.stock_type =1,total,0)) as outTotal,
+        i.remark as remark
+        from inventory i
+        left join contract c on i.contract_id = c.id
+        left join inventory_detail id on i.id = id.inventory_id
+        <where>
+            <if test="contractId != null ">
+                and c.id = #{contractId}
+            </if>
+            <if test="startDate != null ">
+                and i.business_date &gt;= #{startDate}
+            </if>
+            <if test="endDate != null ">
+                and i.business_date &lt;= #{endDate}
+            </if>
+        </where>
+        group by i.business_date
+        order by i.business_date
+    </select>
+    <select id="getBeforeSummary" parameterType="com.ruoyi.business.domain.param.SettleParam" resultType="com.ruoyi.business.domain.vo.SettleSummaryVo">
+        select
+            sum(IF(i.stock_type =0,total,0)) as inTotal,
+            sum(IF(i.stock_type =1,total,0)) as outTotal
+        from inventory i
+        left join contract c on i.contract_id = c.id
+        left join inventory_detail id on i.id = id.inventory_id
+        <where>
+            <if test="contractId != null">
+                and c.id = #{contractId}
+            </if>
+            <if test="endDate != null ">
+                and i.business_date &lt; #{startDate}
+            </if>
+        </where>
+    </select>
+    <select id="selectSettleWeight" resultType="com.ruoyi.business.domain.vo.SettleWeight">
+        select
+            sum(IF(i.statistics_status = 0,0,lessor_theoretical_weight)) as settledWeight,
+            sum(IF(i.statistics_status = 0,lessor_theoretical_weight,0)) as unSettledWeight
+        from inventory i
+        left join contract c on i.contract_id = c.id
+        <where>
+            <if test="startDate != null">
+                and i.business_date >= #{startDate}
+            </if>
+            <if test="endDate != null">
+                and i.business_date &lt;= #{endDate}
+            </if>
+            <if test="contractType != null">
+                and c.type = #{contractType}
+            </if>
+            <if test="contractId != null">
+                and c.id = #{contractId}
+            </if>
+        </where>
+    </select>
+    <select id="selectSettleById" resultMap="SettleSettleInventoryResult">
+        SELECT
+        a.id,
+        a.contract_id,
+        a.reconciliation_start_date,
+        a.reconciliation_end_date,
+        a.theoretical_in_total,
+        a.theoretical_out_total,
+        a.warehouse_in_total,
+        a.warehouse_out_total,
+        a.scene_in_total,
+        a.scene_out_total,
+        a.status,
+        a.remark,
+        a.create_by,
+        a.create_time,
+        a.update_by,
+        a.update_time,
+        a.is_deleted,
+        i.id AS inventoryId,
+        i.create_time AS createTime,
+        i.flow_no AS flowNo,
+        i.business_no AS businessNo,
+        i.business_date AS businessDate,
+        c.type AS contractType,
+        case c.type when 0 then c.purchase_dept_name
+                    when 1 then l.company_name
+                    when 2 then c.lending_dept_name
+                    when 3 then c.bailment_dept_name end as partA,
+        case c.type when 0 then s.supplier_name
+                    when 1 then c.rental_dept_name
+                    when 2 then s1.supplier_name
+                    when 3 then l1.company_name end as partB,
+        i.contract_id AS contractId,
+        c.contract_code AS contractCode,
+        c.contract_name AS contractName,
+        i.stock_type AS stockType,
+        i.operator as operator,
+        i.remark as sub_remark,
+        i.statistics_status,
+        i.lessor_theoretical_weight AS total
+        FROM
+        settle a
+        LEFT JOIN settle_inventory si ON a.id = si.settle_id
+        LEFT JOIN inventory i ON si.inventory_id = i.id
+        LEFT JOIN contract c ON a.contract_id = c.id
+        LEFT JOIN inventory_detail id ON i.id = id.inventory_id
+        left join supplier s on s.id = c.purchase_supplier_id
+        left join lessee l on l.id = c.rental_lessee_id
+        left join supplier s1 on s1.id = c.lending_supplier_id
+        left join lessee l1 on l1.id = c.bailment_lessee_id
+        where a.id = #{id}
+    </select>
+
+    <delete id="deleteSettleById" parameterType="Long">
+        delete from settle where id = #{id}
+    </delete>
+
+    <delete id="deleteSettleByIds" parameterType="String">
+        delete from settle where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSettleInventoryBySettleIds" parameterType="String">
+        delete from settle_inventory where settle_id in
+        <foreach item="settleId" collection="array" open="(" separator="," close=")">
+            #{settleId}
+        </foreach>
+    </delete>
+
+    <delete id="deleteSettleInventoryBySettleId" parameterType="Long">
+        delete from settle_inventory where settle_id = #{settleId}
+    </delete>
+    <update id="updateSettle" parameterType="com.ruoyi.business.domain.Settle">
+        update settle
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="contractId != null">contract_id =
+                #{contractId},
+            </if>
+            <if test="reconciliationStartDate != null">reconciliation_start_date =
+                #{reconciliationStartDate},
+            </if>
+            <if test="reconciliationEndDate != null">reconciliation_end_date =
+                #{reconciliationEndDate},
+            </if>
+            <if test="theoreticalInTotal != null">theoretical_in_total =
+                #{theoreticalInTotal},
+            </if>
+            <if test="theoreticalOutTotal != null">theoretical_out_total =
+                #{theoreticalOutTotal},
+            </if>
+            <if test="warehouseInTotal != null">warehouse_in_total =
+                #{warehouseInTotal},
+            </if>
+            <if test="warehouseOutTotal != null">warehouse_out_total =
+                #{warehouseOutTotal},
+            </if>
+            <if test="sceneInTotal != null">scene_in_total =
+                #{sceneInTotal},
+            </if>
+            <if test="sceneOutTotal != null">scene_out_total =
+                #{sceneOutTotal},
+            </if>
+            <if test="status != null">status =
+                #{status},
+            </if>
+            <if test="remark != null">remark =
+                #{remark},
+            </if>
+            <if test="createBy != null">create_by =
+                #{createBy},
+            </if>
+            <if test="createTime != null">create_time =
+                #{createTime},
+            </if>
+            <if test="updateBy != null">update_by =
+                #{updateBy},
+            </if>
+            <if test="updateTime != null">update_time =
+                #{updateTime},
+            </if>
+            <if test="isDeleted != null">is_deleted =
+                #{isDeleted},
+            </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <update id="updateStatusById">
+        update settle set status = #{status}
+        where id in
+        <foreach collection="idList" item="item" open="(" close=")" separator=",">
+            #{item}
+        </foreach>
+    </update>
+</mapper>

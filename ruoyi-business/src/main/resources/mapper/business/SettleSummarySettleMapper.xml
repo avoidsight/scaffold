@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.SettleSummarySettleMapper">
+
+    <resultMap type="SettleSummarySettle" id="SettleSummarySettleResult">
+            <result property="id" column="id"/>
+            <result property="settleSummaryId" column="settle_summary_id"/>
+            <result property="settleId" column="settle_id"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <sql id="selectSettleSummarySettleVo">
+        select id, settle_summary_id, settle_id, create_by, create_time, update_by, update_time, is_deleted
+        from settle_summary_settle
+    </sql>
+
+    <select id="selectSettleSummarySettleList" parameterType="SettleSummarySettle" resultMap="SettleSummarySettleResult">
+        <include refid="selectSettleSummarySettleVo"/>
+        <where>
+                        <if test="settleSummaryId != null ">
+                            and settle_summary_id = #{settleSummaryId}
+                        </if>
+                        <if test="settleId != null ">
+                            and settle_id = #{settleId}
+                        </if>
+                        <if test="isDeleted != null ">
+                            and is_deleted = #{isDeleted}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectSettleSummarySettleById" parameterType="Long"
+            resultMap="SettleSummarySettleResult">
+            <include refid="selectSettleSummarySettleVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertSettleSummarySettle" parameterType="SettleSummarySettle" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into settle_summary_settle
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="settleSummaryId != null">settle_summary_id,
+                    </if>
+                    <if test="settleId != null">settle_id,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="settleSummaryId != null">#{settleSummaryId},
+                    </if>
+                    <if test="settleId != null">#{settleId},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateSettleSummarySettle" parameterType="SettleSummarySettle">
+        update settle_summary_settle
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="settleSummaryId != null">settle_summary_id =
+                        #{settleSummaryId},
+                    </if>
+                    <if test="settleId != null">settle_id =
+                        #{settleId},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSettleSummarySettleById" parameterType="Long">
+        delete from settle_summary_settle where id = #{id}
+    </delete>
+
+    <delete id="deleteSettleSummarySettleByIds" parameterType="String">
+        delete from settle_summary_settle where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

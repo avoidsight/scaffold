@@ -1,0 +1,259 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.MaterialCategoryMapper">
+
+    <resultMap type="MaterialCategory" id="MaterialCategoryResult">
+            <result property="id" column="id"/>
+            <result property="code" column="code"/>
+            <result property="name" column="name"/>
+            <result property="mUnit" column="m_unit"/>
+            <result property="aUnit" column="a_unit"/>
+            <result property="remarks" column="remarks"/>
+            <result property="flag" column="flag"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <resultMap id="MaterialCategoryMaterialSpecsResult" type="MaterialCategory" extends="MaterialCategoryResult">
+        <collection property="materialSpecsList" notNullColumn="sub_id"
+                    javaType="java.util.List" resultMap="MaterialSpecsResult"/>
+    </resultMap>
+
+    <resultMap type="MaterialSpecs" id="MaterialSpecsResult">
+            <result property="id" column="sub_id"/>
+            <result property="categoryCode" column="sub_category_code"/>
+            <result property="specsName" column="sub_specs_name"/>
+            <result property="specsType" column="sub_specs_type"/>
+            <result property="diameter" column="sub_diameter"/>
+            <result property="thickness" column="sub_thickness"/>
+            <result property="lengths" column="sub_lengths"/>
+            <result property="material" column="sub_material"/>
+            <result property="units" column="sub_units"/>
+            <result property="singleWeight" column="sub_single_weight"/>
+            <result property="packagesNumber" column="sub_packages_number"/>
+            <result property="createBy" column="sub_create_by"/>
+            <result property="createTime" column="sub_create_time"/>
+            <result property="updateBy" column="sub_update_by"/>
+            <result property="updateTime" column="sub_update_time"/>
+            <result property="isDeleted" column="sub_is_deleted"/>
+    </resultMap>
+
+    <sql id="selectMaterialCategoryVo">
+        select a.id, a.code, a.name, a.m_unit, a.a_unit, a.remarks, a.flag, a.create_by, a.create_time, a.update_by, a.update_time, a.is_deleted,
+               b.id as
+                   sub_id, b.category_code as
+                   sub_category_code, b.specs_name as
+                   sub_specs_name, b.specs_type as
+                   sub_specs_type, b.diameter as
+                   sub_diameter, b.thickness as
+                   sub_thickness, b.lengths as
+                   sub_lengths, b.material as
+                   sub_material, b.units as
+                   sub_units, b.single_weight as
+                   sub_single_weight, b.packages_number as
+                   sub_packages_number, b.create_by as
+                   sub_create_by, b.create_time as
+                   sub_create_time, b.update_by as
+                   sub_update_by, b.update_time as
+                   sub_update_time, b.is_deleted as
+                   sub_is_deleted
+        from material_category a
+                 left join material_specs b on b.category_code = a.id
+    </sql>
+
+    <select id="selectMaterialCategoryList" parameterType="MaterialCategory" resultMap="MaterialCategoryMaterialSpecsResult">
+        <include refid="selectMaterialCategoryVo"/>
+        <where>
+                        <if test="code != null  and code != ''">
+                            and code = #{code}
+                        </if>
+                        <if test="name != null  and name != ''">
+                            and name like concat('%', #{name}, '%')
+                        </if>
+                        <if test="mUnit != null  and mUnit != ''">
+                            and m_unit = #{mUnit}
+                        </if>
+                        <if test="aUnit != null  and aUnit != ''">
+                            and a_unit = #{aUnit}
+                        </if>
+                        <if test="remarks != null  and remarks != ''">
+                            and remarks = #{remarks}
+                        </if>
+                        <if test="flag != null ">
+                            and flag = #{flag}
+                        </if>
+                        <if test="isDeleted != null ">
+                            and is_deleted = #{isDeleted}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectMaterialCategoryById" parameterType="Long"
+            resultMap="MaterialCategoryMaterialSpecsResult">
+            select a.id, a.code, a.name, a.m_unit, a.a_unit, a.remarks, a.flag, a.create_by, a.create_time, a.update_by, a.update_time, a.is_deleted,
+ b.id as
+                sub_id, b.category_code as
+                sub_category_code, b.specs_name as
+                sub_specs_name, b.specs_type as
+                sub_specs_type, b.diameter as
+                sub_diameter, b.thickness as
+                sub_thickness, b.lengths as
+                sub_lengths, b.material as
+                sub_material, b.units as
+                sub_units, b.single_weight as
+                sub_single_weight, b.packages_number as
+                sub_packages_number, b.create_by as
+                sub_create_by, b.create_time as
+                sub_create_time, b.update_by as
+                sub_update_by, b.update_time as
+                sub_update_time, b.is_deleted as
+                sub_is_deleted
+            from material_category a
+            left join material_specs b on b.category_code = a.id
+            where a.id = #{id}
+    </select>
+
+    <insert id="insertMaterialCategory" parameterType="MaterialCategory" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into material_category
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="code != null">code,
+                    </if>
+                    <if test="name != null">name,
+                    </if>
+                    <if test="mUnit != null">m_unit,
+                    </if>
+                    <if test="aUnit != null">a_unit,
+                    </if>
+                    <if test="remarks != null">remarks,
+                    </if>
+                    <if test="flag != null">flag,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="code != null">#{code},
+                    </if>
+                    <if test="name != null">#{name},
+                    </if>
+                    <if test="mUnit != null">#{mUnit},
+                    </if>
+                    <if test="aUnit != null">#{aUnit},
+                    </if>
+                    <if test="remarks != null">#{remarks},
+                    </if>
+                    <if test="flag != null">#{flag},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateMaterialCategory" parameterType="MaterialCategory">
+        update material_category
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="code != null">code =
+                        #{code},
+                    </if>
+                    <if test="name != null">name =
+                        #{name},
+                    </if>
+                    <if test="mUnit != null">m_unit =
+                        #{mUnit},
+                    </if>
+                    <if test="aUnit != null">a_unit =
+                        #{aUnit},
+                    </if>
+                    <if test="remarks != null">remarks =
+                        #{remarks},
+                    </if>
+                    <if test="flag != null">flag =
+                        #{flag},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteMaterialCategoryById" parameterType="Long">
+        delete from material_category where id = #{id}
+    </delete>
+
+    <delete id="deleteMaterialCategoryByIds" parameterType="String">
+        delete from material_category where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+    <delete id="deleteMaterialSpecsByCategoryCodes" parameterType="String">
+        delete from material_specs where category_code in
+        <foreach item="categoryCode" collection="array" open="(" separator="," close=")">
+            #{categoryCode}
+        </foreach>
+    </delete>
+
+    <delete id="deleteMaterialSpecsByCategoryCode" parameterType="Long">
+        delete from material_specs where category_code = #{categoryCode}
+    </delete>
+
+    <insert id="batchMaterialSpecs">
+        insert into material_specs
+        ( id        , category_code        , specs_name        , specs_type        , diameter        , thickness        , lengths        , material        , units        , single_weight        , packages_number        , create_by        , create_time        , update_by        , update_time        , is_deleted) values
+        <foreach item="item" index="index" collection="list" separator=",">
+            ( #{item.id
+            }, #{item.categoryCode
+            }, #{item.specsName
+            }, #{item.specsType
+            }, #{item.diameter
+            }, #{item.thickness
+            }, #{item.lengths
+            }, #{item.material
+            }, #{item.units
+            }, #{item.singleWeight
+            }, #{item.packagesNumber
+            }, #{item.createBy
+            }, #{item.createTime
+            }, #{item.updateBy
+            }, #{item.updateTime
+            }, #{item.isDeleted
+            })
+        </foreach>
+    </insert>
+</mapper>

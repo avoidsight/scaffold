@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.ManufacturerMapper">
+
+    <resultMap type="Manufacturer" id="ManufacturerResult">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="address" column="address"/>
+            <result property="legal" column="legal"/>
+            <result property="registerFunds" column="register_funds"/>
+            <result property="contacts" column="contacts"/>
+            <result property="contactPhone" column="contact_phone"/>
+            <result property="remark" column="remark"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+    </resultMap>
+
+    <sql id="selectManufacturerVo">
+        select id, name, address, legal, register_funds, contacts, contact_phone, remark, create_by, create_time, update_by, update_time, is_deleted
+        from manufacturer
+    </sql>
+
+    <select id="selectManufacturerList" parameterType="Manufacturer" resultMap="ManufacturerResult">
+        <include refid="selectManufacturerVo"/>
+        <where>
+                        <if test="name != null  and name != ''">
+                            and name like concat('%', #{name}, '%')
+                        </if>
+                        <if test="address != null  and address != ''">
+                            and address = #{address}
+                        </if>
+                        <if test="legal != null  and legal != ''">
+                            and legal = #{legal}
+                        </if>
+                        <if test="registerFunds != null ">
+                            and register_funds = #{registerFunds}
+                        </if>
+                        <if test="contacts != null  and contacts != ''">
+                            and contacts = #{contacts}
+                        </if>
+                        <if test="contactPhone != null  and contactPhone != ''">
+                            and contact_phone = #{contactPhone}
+                        </if>
+                        <if test="isDeleted != null ">
+                            and is_deleted = #{isDeleted}
+                        </if>
+        </where>
+    </select>
+
+    <select id="selectManufacturerById" parameterType="Long"
+            resultMap="ManufacturerResult">
+            <include refid="selectManufacturerVo"/>
+            where id = #{id}
+    </select>
+
+    <insert id="insertManufacturer" parameterType="Manufacturer" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into manufacturer
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="name != null and name != ''">name,
+                    </if>
+                    <if test="address != null and address != ''">address,
+                    </if>
+                    <if test="legal != null">legal,
+                    </if>
+                    <if test="registerFunds != null">register_funds,
+                    </if>
+                    <if test="contacts != null">contacts,
+                    </if>
+                    <if test="contactPhone != null">contact_phone,
+                    </if>
+                    <if test="remark != null">remark,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="name != null and name != ''">#{name},
+                    </if>
+                    <if test="address != null and address != ''">#{address},
+                    </if>
+                    <if test="legal != null">#{legal},
+                    </if>
+                    <if test="registerFunds != null">#{registerFunds},
+                    </if>
+                    <if test="contacts != null">#{contacts},
+                    </if>
+                    <if test="contactPhone != null">#{contactPhone},
+                    </if>
+                    <if test="remark != null">#{remark},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateManufacturer" parameterType="Manufacturer">
+        update manufacturer
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="name != null and name != ''">name =
+                        #{name},
+                    </if>
+                    <if test="address != null and address != ''">address =
+                        #{address},
+                    </if>
+                    <if test="legal != null">legal =
+                        #{legal},
+                    </if>
+                    <if test="registerFunds != null">register_funds =
+                        #{registerFunds},
+                    </if>
+                    <if test="contacts != null">contacts =
+                        #{contacts},
+                    </if>
+                    <if test="contactPhone != null">contact_phone =
+                        #{contactPhone},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteManufacturerById" parameterType="Long">
+        delete from manufacturer where id = #{id}
+    </delete>
+
+    <delete id="deleteManufacturerByIds" parameterType="String">
+        delete from manufacturer where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.business.mapper.SettlementMapper">
+
+    <resultMap type="com.ruoyi.business.domain.Settlement" id="SettlementResult">
+            <result property="id" column="id"/>
+            <result property="settleId" column="settle_id"/>
+            <result property="settlementDate" column="settlement_date"/>
+            <result property="fileDate" column="file_date"/>
+            <result property="status" column="status"/>
+            <result property="remark" column="remark"/>
+            <result property="createBy" column="create_by"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateBy" column="update_by"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="isDeleted" column="is_deleted"/>
+            <result property="contractId" column="contract_id"/>
+            <result property="totalWeight" column="total_weight"/>
+    </resultMap>
+
+    <sql id="selectSettlementVo">
+        select id, settle_id, settlement_date, file_date, status, remark, create_by, create_time, update_by, update_time, is_deleted, contract_id, total_weight
+        from settlement
+    </sql>
+
+    <select id="selectSettlementList" parameterType="com.ruoyi.business.domain.param.BillingAccountParam" resultType="com.ruoyi.business.domain.vo.SettlementVo">
+        select
+        sm.id,
+        sm.create_time,
+        CONCAT(DATE_FORMAT(s.reconciliation_start_date,'%Y-%m-%d'),'~',DATE_FORMAT(s.reconciliation_end_date,'%Y-%m-%d')) as profession_date,
+        ct.type ,
+        case ct.type when 0 then ct.purchase_dept_name
+        when 1 then l.company_name
+        when 2 then ct.lending_dept_name
+        when 3 then ct.bailment_dept_name
+        end as supply_department,
+
+        case ct.type when 0 then sl.supplier_name
+        when 1 then ct.rental_dept_name
+        when 2 then sll.supplier_name
+        when 3 then ll.company_name
+        end as collect_department,
+
+        ct.contract_code,
+        ct.contract_name,
+        ct.form_code,
+        ct.business_code,
+        sm.total_weight,
+        ct.operator,
+        sm.status
+        from
+        settlement sm
+        LEFT JOIN contract ct on sm.contract_id = ct.id
+        LEFT JOIN settle s on sm.settle_id = s.id
+
+        left join lessee l on l.id = ct.rental_lessee_id
+        left join supplier sl on ct.purchase_supplier_id = sl.id
+        left join lessee ll on ll.id = ct.rental_lessee_id
+        left join supplier sll on ct.lending_supplier_id = sll.id
+        <where>
+            <if test="contractType != null ">
+                and ct.type = #{contractType}
+            </if>
+            <if test="startDate != null ">
+                and sm.create_time &gt;= DATE_FORMAT(#{startDate},'%Y-%m-%d 00:00:00')
+            </if>
+            <if test="endDate != null ">
+                and sm.create_time &lt; DATE_FORMAT(#{endDate},'%Y-%m-%d 23:59:59')
+            </if>
+            <if test="name != null ">
+                and ct.contract_name like CONCAT('%',#{name},'%')
+            </if>
+        </where>
+    </select>
+
+    <select id="selectSettlementById" parameterType="Long"
+            resultMap="SettlementResult">
+            <include refid="selectSettlementVo"/>
+            where id = #{id}
+    </select>
+
+    <select id="selectSettleId" parameterType="java.util.List"
+            resultType="Long">
+        select settle_id
+        from settlement
+        where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </select>
+
+    <insert id="insertSettlement" parameterType="Settlement" useGeneratedKeys="true"
+            keyProperty="id">
+        insert into settlement
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+                    <if test="settleId != null">settle_id,
+                    </if>
+                    <if test="settlementDate != null">settlement_date,
+                    </if>
+                    <if test="fileDate != null">file_date,
+                    </if>
+                    <if test="status != null">status,
+                    </if>
+                    <if test="remark != null">remark,
+                    </if>
+                    <if test="createBy != null">create_by,
+                    </if>
+                    <if test="createTime != null">create_time,
+                    </if>
+                    <if test="updateBy != null">update_by,
+                    </if>
+                    <if test="updateTime != null">update_time,
+                    </if>
+                    <if test="isDeleted != null">is_deleted,
+                    </if>
+                    <if test="contractId != null">contract_id,
+                    </if>
+                    <if test="totalWeight != null">total_weight,
+                    </if>
+                    <if test="totalMoney != null">total_money,
+                    </if>
+                    <if test="resources != null">resources,
+                    </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+                    <if test="settleId != null">#{settleId},
+                    </if>
+                    <if test="settlementDate != null">#{settlementDate},
+                    </if>
+                    <if test="fileDate != null">#{fileDate},
+                    </if>
+                    <if test="status != null">#{status},
+                    </if>
+                    <if test="remark != null">#{remark},
+                    </if>
+                    <if test="createBy != null">#{createBy},
+                    </if>
+                    <if test="createTime != null">#{createTime},
+                    </if>
+                    <if test="updateBy != null">#{updateBy},
+                    </if>
+                    <if test="updateTime != null">#{updateTime},
+                    </if>
+                    <if test="isDeleted != null">#{isDeleted},
+                    </if>
+                    <if test="contractId != null">#{contractId},
+                    </if>
+                    <if test="totalWeight != null">#{totalWeight},
+                    </if>
+                    <if test="totalMoney != null">#{totalMoney},
+                    </if>
+                    <if test="resources != null">#{resources},
+                    </if>
+        </trim>
+    </insert>
+
+    <update id="updateSettlement" parameterType="Settlement">
+        update settlement
+        <trim prefix="SET" suffixOverrides=",">
+                    <if test="settleId != null">settle_id =
+                        #{settleId},
+                    </if>
+                    <if test="settlementDate != null">settlement_date =
+                        #{settlementDate},
+                    </if>
+                    <if test="fileDate != null">file_date =
+                        #{fileDate},
+                    </if>
+                    <if test="status != null">status =
+                        #{status},
+                    </if>
+                    <if test="remark != null">remark =
+                        #{remark},
+                    </if>
+                    <if test="createBy != null">create_by =
+                        #{createBy},
+                    </if>
+                    <if test="createTime != null">create_time =
+                        #{createTime},
+                    </if>
+                    <if test="updateBy != null">update_by =
+                        #{updateBy},
+                    </if>
+                    <if test="updateTime != null">update_time =
+                        #{updateTime},
+                    </if>
+                    <if test="isDeleted != null">is_deleted =
+                        #{isDeleted},
+                    </if>
+                    <if test="contractId != null">contract_id =
+                        #{contractId},
+                    </if>
+                    <if test="totalWeight != null">total_weight =
+                        #{totalWeight},
+                    </if>
+                    <if test="totalMoney != null">total_money = #{totalMoney},
+                    </if>
+                    <if test="resources != null">resources = #{resources},
+                    </if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteSettlementById" parameterType="Long">
+        delete from settlement where id = #{id}
+    </delete>
+
+    <delete id="deleteSettlementByIds" parameterType="String">
+        delete from settlement where id in
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+
+    <resultMap id ="leaseSettlementResult" type="com.ruoyi.business.domain.vo.LeaseSettlementChecklistVo">
+        <id property="id" column="id"/>
+        <result property="materialName" column="material_name"/>
+        <result property="contractId" column="contract_id"/>
+        <result property="settleId" column="settle_id"/>
+        <result property="settlementId" column="settlement_id"/>
+        <result property="date" column="business_date"/>
+
+        <result property="theoreticalWeight"      column="weight"/>
+        <result property="warehouseWeight"      column="warehouse_weight"/>
+        <result property="sceneWeight"      column="scene_weight"/>
+        <result property="rate"      column="rate"/>
+        <result property="totalMoney"      column="total_money"/>
+        <result property="otherMoney"      column="other_money"/>
+        <result property="remark"      column="remark"/>
+        <collection  property="list"  javaType="arraylist" ofType="com.ruoyi.business.domain.vo.SettlementFeesVo" select="selectChild" column="{inventoryId=id,contractId = contract_id}">
+        </collection >
+    </resultMap>
+
+    <select id="listLeaseSettlement" resultMap="leaseSettlementResult">
+        select
+            i.id as id,
+            c.id as contract_id,
+            '盘扣式脚手架' as material_name,
+            i.business_date as business_date,
+            "" as remark,
+            if(i.stock_type=0,i.lessor_theoretical_weight/1000,-i.lessor_theoretical_weight/1000) as weight,
+            if(i.stock_type=0,i.warehouse_weight/1000,-i.warehouse_weight/1000) as warehouse_weight,
+            if(i.stock_type=0,i.scene_weight/1000,-i.scene_weight/1000) as scene_weight,
+            (
+                select sum(ifnull(if(i.stock_type=0,idt.total,-idt.total)* cb.unit_price * (1-cb.rate),0)) as money
+                from inventory_detail idt
+                LEFT JOIN material_category mc on idt.material_category_id = mc.id
+                left join contract_billing cb on cb.billing_name = mc.name and cb.contract_id = i.contract_id
+                where idt.inventory_id = ss.inventory_id
+            ) as total_money,
+            (
+                select
+                sum(
+                    ifnull(if(i.stock_type=0,fee.charged_count,-fee.charged_count)* cb.unit_price * (1-cb.rate),0)
+                ) + i.car_rental_fee+i.loading_fee+i.unloading_fee+i.freight as money
+                from inventory_fee fee
+                left join contract_billing cb on cb.id = fee.fee_id
+                where fee.inventory_id = ss.inventory_id
+                ) as other_money,
+            (select cb.rate
+                from inventory_detail idt
+                LEFT JOIN material_category mc on idt.material_category_id = mc.id
+                left join contract_billing cb on cb.billing_name = mc.name and cb.contract_id = i.contract_id
+                where idt.inventory_id = ss.inventory_id
+                limit 1) as rate
+
+            from settle_inventory ss
+            left join inventory i on ss.inventory_id = i.id
+            left join contract c on c.id = i.contract_id
+            where ss.settle_id = #{id}
+            order by i.business_date
+
+    </select>
+
+    <select id="listLeaseSettlementEdit" resultMap="leaseSettlementResult">
+        select
+            i.id as id,
+            c.id as contract_id,
+            s.id as settle_id,
+            sm.id as settlement_id,
+            '盘扣式脚手架' as material_name,
+            i.business_date as business_date,
+            smd.remark as remark,
+            if(i.stock_type=0,i.lessor_theoretical_weight/1000,-i.lessor_theoretical_weight/1000) as weight,
+            if(i.stock_type=0,i.warehouse_weight/1000,-i.warehouse_weight/1000) as warehouse_weight,
+            if(i.stock_type=0,i.scene_weight/1000,-i.scene_weight/1000) as scene_weight,
+            (
+                select sum(ifnull(if(i.stock_type=0,idt.total,-idt.total)* cb.unit_price * (1-cb.rate),0)) as money
+                from inventory_detail idt
+                         LEFT JOIN material_category mc on idt.material_category_id = mc.id
+                         left join contract_billing cb on cb.billing_name = mc.name and cb.contract_id = i.contract_id
+                where idt.inventory_id = ss.inventory_id
+            ) as total_money,
+            (
+                select
+                sum(
+                 ifnull(if(i.stock_type=0,fee.charged_count,-fee.charged_count)* cb.unit_price * (1-cb.rate),0)
+                ) + i.car_rental_fee+i.loading_fee+i.unloading_fee+i.freight as money
+                from inventory_fee fee
+                left join contract_billing cb on cb.id = fee.fee_id
+                where fee.inventory_id = ss.inventory_id
+            ) as other_money,
+            (select cb.rate
+                from inventory_detail idt
+                LEFT JOIN material_category mc on idt.material_category_id = mc.id
+                left join contract_billing cb on cb.billing_name = mc.name and cb.contract_id = i.contract_id
+                where idt.inventory_id = ss.inventory_id
+                limit 1) as rate
+
+        from settlement sm
+        left join settle s on s.id = sm.settle_id
+        left join  settle_inventory ss on ss.settle_id = s.id
+        left join inventory i on ss.inventory_id = i.id
+        left join contract c on c.id = i.contract_id
+        left join settlement_detail smd on smd.settlement_id = sm.id and smd.inventory_id = i.id
+        where sm.id = #{id}
+        order by i.business_date
+    </select>
+
+    <select id="selectChild" resultType="com.ruoyi.business.domain.vo.SettlementFeesVo">
+        select
+            idt.total as counts,
+            cb.unit_price as unit_price,
+            cb.unit as unit,
+            ms.specs_name as standard,
+            mc.name as material_name,
+            cb.expense_type as types_of_fee,
+            cb.billing_name as fee_name,
+            cb.rate as rate,
+            ROUND(idt.total* cb.unit_price * (1-cb.rate),2) as money
+        from inventory_detail idt
+            LEFT JOIN material_category mc on idt.material_category_id = mc.id
+            LEFT JOIN material_specs ms on ms.id = idt.material_spec_id
+            left join contract_billing cb on  cb.id = idt.fee_id and cb.contract_id = #{contractId}
+        where idt.inventory_id = #{inventoryId}
+        UNION
+        select
+            ifee.charged_count as counts,
+            cb.unit_price as unit_price,
+            cb.unit as unit,
+            ms.specs_name as standard,
+            mc.name as material_name,
+            cb.expense_type as types_of_fee,
+            cb.billing_name as fee_name,
+            cb.rate  as rate,
+            ROUND(ifee.charged_count * cb.unit_price * (1-cb.rate),2) as money
+        from inventory_fee ifee
+            LEFT JOIN material_category mc on ifee.material_category_id = mc.id
+            LEFT JOIN material_specs ms on ms.id = ifee.material_spec_id
+            left join contract_billing cb on cb.contract_id = #{contractId} and cb.id = ifee.fee_id
+        where ifee.inventory_id = #{inventoryId}
+        UNION
+        select
+            "" as counts,
+            "" as unit_price,
+            "" as unit,
+            "" as standard,
+            "" as  material_name,
+            t.name as types_of_fee,
+            t.name as fee_name,
+            ""  as rate,
+            case name
+                when '出租运费' then i.car_rental_fee
+                when '装车费'   then i.loading_fee
+                when '卸车费' then i.unloading_fee
+                when '运输费'  then i.freight
+                end money
+        from (
+                 select "出租运费" as name
+                 UNION
+                 select "装车费" as name
+                 UNION
+                 select "卸车费" as name
+                 UNION
+                 select "运输费" as name) t
+                 LEFT JOIN inventory i on 1=1
+        where i.id = #{inventoryId}
+
+    </select>
+
+    <select id="getLeaseSettlementChecklistHeaderById" resultType="com.ruoyi.business.domain.vo.LeaseSettlementChecklistHeaderVo">
+        select c.contract_name,
+               c.id as contract_id,
+               c.contract_code,
+               c.project_name,
+               CONCAT(s.reconciliation_start_date,'~',s.reconciliation_end_date) as rental_date,
+               sm.resources as resources,
+               sm.id,
+               c.type,
+               s.id as settle_id,
+               sm.total_weight,
+               sm.total_money,
+               sm.status,
+
+       c.purchase_dept_name,  max(case when c.purchase_supplier_id = sl.id then sl.supplier_name end)  as purchase_supplier_name,
+       c.lending_dept_name, max(case when c.lending_supplier_id = sl.id then sl.supplier_name end)  as lending_supplier_name,
+
+
+       max(case when l.id = c.rental_lessee_id then l.company_name end) as rental_lessee_name,c.rental_dept_name,
+
+       c.bailment_dept_name,max(case when l.id = c.bailment_lessee_id then l.company_name end) as bailment_lessee_name
+
+        from settle s
+        left join contract c on s.contract_id = c.id
+        left join settlement sm on sm.settle_id = s.id
+
+        left join lessee l on l.id = c.rental_lessee_id or l.id = c.bailment_lessee_id
+        left join supplier sl on c.lending_supplier_id = sl.id or c.purchase_supplier_id = sl.id
+        where s.id = #{id} and s.is_deleted = 0
+        GROUP BY s.id
+    </select>
+</mapper>
